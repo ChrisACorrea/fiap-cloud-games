@@ -60,14 +60,22 @@ git clone https://github.com/FelipeMorandini/fiap-cloud-games.git
 cd fiap-cloud-games
 ```
 
-### 2. Restaurar dependências e compilar
+### 2. Subir o MongoDB local
+
+```bash
+docker compose up -d
+```
+
+O MongoDB estará disponível em `mongodb://localhost:27017`. O health check garante que o banco está pronto antes de aceitar conexões.
+
+### 3. Restaurar dependências e compilar
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### 3. Executar a API
+### 4. Executar a API
 
 ```bash
 dotnet run --project src/FiapCloudGames.API
