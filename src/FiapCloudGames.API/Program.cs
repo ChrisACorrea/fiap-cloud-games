@@ -60,6 +60,9 @@ try
     });
 
     builder.Services.AddMongoDb(builder.Configuration);
+    builder.Services.AddJwtAuthentication(builder.Configuration);
+    builder.Services.AddInfrastructureServices();
+    builder.Services.AddApplicationServices();
 
     var app = builder.Build();
 
@@ -77,6 +80,7 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
 
