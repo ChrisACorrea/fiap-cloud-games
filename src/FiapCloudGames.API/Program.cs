@@ -1,3 +1,4 @@
+using FiapCloudGames.API.Middlewares;
 using FiapCloudGames.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -62,6 +63,7 @@ try
 
     var app = builder.Build();
 
+    app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
     app.UseSerilogRequestLogging();
 
     if (app.Environment.IsDevelopment())
