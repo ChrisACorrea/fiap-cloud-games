@@ -1,6 +1,8 @@
 using System.Text;
 using FiapCloudGames.Application.Interfaces;
 using FiapCloudGames.Application.Services;
+using FiapCloudGames.Domain.Repositories;
+using FiapCloudGames.Infrastructure.Repositories;
 using FiapCloudGames.Infrastructure.Services;
 using FiapCloudGames.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -79,6 +81,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<IJogoRepository, JogoRepository>();
+        services.AddScoped<IBibliotecaRepository, BibliotecaRepository>();
 
         return services;
     }
