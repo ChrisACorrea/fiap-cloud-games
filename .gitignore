@@ -52,3 +52,50 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# IDEs
+.idea/
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+*.sln.iml
+
+# macOS
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# dotnet tools
+.dotnet/
+
+# Secrets & environment
+appsettings.*.local.json
+*.env
+.env.*
+
+# Coverage reports
+coverage/
+*.coveragexml
+*.opencover.xml
+lcov.info
+
+# Docker
+docker-compose.override.yml
+
+# MongoDB data (local dev)
+mongo-data/
+
+# Published output
+publish/
+out/
