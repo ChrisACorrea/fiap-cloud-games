@@ -1,9 +1,7 @@
 using FiapCloudGames.API.Middlewares;
 using FiapCloudGames.Infrastructure.Extensions;
-using FiapCloudGames.Infrastructure.Persistence;
 using FiapCloudGames.Infrastructure.Seed;
 using Microsoft.OpenApi.Models;
-using MongoDB.Driver;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -62,8 +60,6 @@ try
         }
     });
 
-    BsonMappings.Configure();
-
     builder.Services.AddMongoDb(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);
     builder.Services.AddInfrastructureServices();
@@ -88,12 +84,6 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var database = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
-        await MongoDbIndexes.CreateAsync(database);
-    }
 
     await DatabaseSeed.SeedAsync(app.Services);
 

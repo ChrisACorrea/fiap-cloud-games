@@ -1,34 +1,47 @@
 using FiapCloudGames.Domain.Entities;
 using FiapCloudGames.Domain.Repositories;
-using MongoDB.Driver;
+using FiapCloudGames.Domain.ValueObjects;
+using FiapCloudGames.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace FiapCloudGames.Infrastructure.Repositories;
 
-public sealed class UsuarioRepository(IMongoDatabase database) : IUsuarioRepository
+public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 {
-    private readonly IMongoCollection<Usuario> _collection = database.GetCollection<Usuario>("usuarios");
-
     public async Task<Usuario?> ObterPorIdAsync(string id, CancellationToken ct = default) =>
-        await _collection.Find(u => u.Id == id).FirstOrDefaultAsync(ct);
+        await context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, ct);
 
     public async Task<Usuario?> ObterPorEmailAsync(string email, CancellationToken ct = default) =>
-        await _collection.Find(u => u.Email == new Domain.ValueObjects.Email(email)).FirstOrDefaultAsync(ct);
+        await context.Usuarios.FirstOrDefaultAsync(u => u.Email == new Email(email), ct);
 
     public async Task<IEnumerable<Usuario>> ObterTodosAsync(int pagina, int tamanhoPagina, CancellationToken ct = default) =>
-        await _collection.Find(FilterDefinition<Usuario>.Empty)
+        await context.Usuarios
             .Skip((pagina - 1) * tamanhoPagina)
-            .Limit(tamanhoPagina)
+            .Take(tamanhoPagina)
             .ToListAsync(ct);
 
-    public async Task CriarAsync(Usuario usuario, CancellationToken ct = default) =>
-        await _collection.InsertOneAsync(usuario, cancellationToken: ct);
+    public async Task CriarAsync(Usuario usuario, CancellationToken ct = default)
+    {
+        context.Usuarios.Add(usuario);
+        await context.SaveChangesAsync(ct);
+    }
 
-    public async Task AtualizarAsync(Usuario usuario, CancellationToken ct = default) =>
-        await _collection.ReplaceOneAsync(u => u.Id == usuario.Id, usuario, cancellationToken: ct);
+    public async Task AtualizarAsync(Usuario usuario, CancellationToken ct = default)
+    {
+        context.Usuarios.Update(usuario);
+        await context.SaveChangesAsync(ct);
+    }
 
-    public async Task RemoverAsync(string id, CancellationToken ct = default) =>
-        await _collection.DeleteOneAsync(u => u.Id == id, ct);
+    public async Task RemoverAsync(string id, CancellationToken ct = default)
+    {
+        var usuario = await context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, ct);
+        if (usuario is not null)
+        {
+            context.Usuarios.Remove(usuario);
+            await context.SaveChangesAsync(ct);
+        }
+    }
 
     public async Task<bool> EmailExisteAsync(string email, CancellationToken ct = default) =>
-        await _collection.Find(u => u.Email == new Domain.ValueObjects.Email(email)).AnyAsync(ct);
+        await context.Usuarios.AnyAsync(u => u.Email == new Email(email), ct);
 }
