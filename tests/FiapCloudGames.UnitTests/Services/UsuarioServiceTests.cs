@@ -88,4 +88,75 @@ public class UsuarioServiceTests
 
         await act.Should().ThrowAsync<ConflitoDeDadosException>();
     }
+
+    [Fact]
+    public async Task ObterPorIdAsync_DeveRetornarUsuario_QuandoEncontrado()
+    {
+        var usuario = new Usuario("Felipe", new Email("felipe@email.com"), "hash");
+        _repositoryMock.Setup(r => r.ObterPorIdAsync("id", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(usuario);
+
+        var result = await _service.ObterPorIdAsync("id");
+
+        result.Nome.Should().Be("Felipe");
+        result.Email.Should().Be("felipe@email.com");
+    }
+
+    [Fact]
+    public async Task ListarAsync_DeveRetornarPaginacao()
+    {
+        var usuarios = new List<Usuario>
+        {
+            new("User 1", new Email("u1@email.com"), "hash"),
+            new("User 2", new Email("u2@email.com"), "hash")
+        };
+        _repositoryMock.Setup(r => r.ObterTodosAsync(1, 10, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(usuarios);
+
+        var result = await _service.ListarAsync(1, 10);
+
+        result.Itens.Should().HaveCount(2);
+        result.Pagina.Should().Be(1);
+        result.TamanhoPagina.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task AtualizarAsync_DeveRetornarUsuarioAtualizado_QuandoDadosValidos()
+    {
+        var usuario = new Usuario("Felipe", new Email("felipe@email.com"), "hash");
+        _repositoryMock.Setup(r => r.ObterPorIdAsync("id", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(usuario);
+        _repositoryMock.Setup(r => r.EmailExisteAsync("novo@email.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var dto = new AtualizarUsuarioRequestDto("Novo Nome", "novo@email.com");
+        var result = await _service.AtualizarAsync("id", dto);
+
+        result.Nome.Should().Be("Novo Nome");
+        result.Email.Should().Be("novo@email.com");
+        _repositoryMock.Verify(r => r.AtualizarAsync(usuario, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AtualizarAsync_DeveLancarExcecao_QuandoUsuarioNaoEncontrado()
+    {
+        _repositoryMock.Setup(r => r.ObterPorIdAsync("id", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Usuario?)null);
+
+        var dto = new AtualizarUsuarioRequestDto("Nome", "email@test.com");
+        var act = () => _service.AtualizarAsync("id", dto);
+
+        await act.Should().ThrowAsync<EntidadeNaoEncontradaException>();
+    }
+
+    [Fact]
+    public async Task RemoverAsync_DeveLancarExcecao_QuandoUsuarioNaoEncontrado()
+    {
+        _repositoryMock.Setup(r => r.ObterPorIdAsync("id", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Usuario?)null);
+
+        var act = () => _service.RemoverAsync("id");
+
+        await act.Should().ThrowAsync<EntidadeNaoEncontradaException>();
+    }
 }

@@ -16,7 +16,8 @@ public sealed class JogoConfiguration : IEntityTypeConfiguration<Jogo>
 
         builder.Property(j => j.Id)
             .HasBsonRepresentation(BsonType.ObjectId)
-            .ValueGeneratedOnAdd();
+            .HasValueGenerator<ObjectIdStringValueGenerator>();
+        builder.Property(j => j.Id).Metadata.Sentinel = string.Empty;
 
         builder.Property(j => j.Titulo)
             .IsRequired();

@@ -1,5 +1,7 @@
 using FiapCloudGames.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using MongoDB.Bson;
 
 namespace FiapCloudGames.Infrastructure.Persistence;
@@ -10,29 +12,19 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<Jogo> Jogos => Set<Jogo>();
     public DbSet<BibliotecaJogo> BibliotecaJogos => Set<BibliotecaJogo>();
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
+}
 
-    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-    {
-        GenerateObjectIds();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-    }
-
-    private void GenerateObjectIds()
-    {
-        var addedEntries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added && !e.Metadata.IsOwned());
-
-        foreach (var entry in addedEntries)
-        {
-            var idProperty = entry.Property("Id");
-            if (idProperty.CurrentValue is string id && string.IsNullOrEmpty(id))
-            {
-                idProperty.CurrentValue = ObjectId.GenerateNewId().ToString();
-            }
-        }
-    }
+public sealed class ObjectIdStringValueGenerator : ValueGenerator<string>
+{
+    public override string Next(EntityEntry entry) => ObjectId.GenerateNewId().ToString();
+    public override bool GeneratesTemporaryValues => false;
 }
