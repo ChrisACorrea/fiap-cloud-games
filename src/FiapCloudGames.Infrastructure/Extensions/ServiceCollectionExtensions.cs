@@ -2,10 +2,12 @@ using System.Text;
 using FiapCloudGames.Application.Interfaces;
 using FiapCloudGames.Application.Services;
 using FiapCloudGames.Domain.Repositories;
+using FiapCloudGames.Infrastructure.Persistence;
 using FiapCloudGames.Infrastructure.Repositories;
 using FiapCloudGames.Infrastructure.Services;
 using FiapCloudGames.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -17,24 +19,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {
+        var mongoSettings = configuration.GetSection(MongoDbSettings.SectionName).Get<MongoDbSettings>()
+            ?? throw new InvalidOperationException("MongoDbSettings não configurado.");
+
         services.Configure<MongoDbSettings>(configuration.GetSection(MongoDbSettings.SectionName));
 
-        services.AddSingleton<IMongoClient>(sp =>
-        {
-            var settings = configuration.GetSection(MongoDbSettings.SectionName).Get<MongoDbSettings>()
-                ?? throw new InvalidOperationException("MongoDbSettings não configurado.");
+        var mongoClient = new MongoClient(mongoSettings.ConnectionString);
 
-            return new MongoClient(settings.ConnectionString);
-        });
-
-        services.AddScoped<IMongoDatabase>(sp =>
-        {
-            var settings = configuration.GetSection(MongoDbSettings.SectionName).Get<MongoDbSettings>()
-                ?? throw new InvalidOperationException("MongoDbSettings não configurado.");
-
-            var client = sp.GetRequiredService<IMongoClient>();
-            return client.GetDatabase(settings.DatabaseName);
-        });
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseMongoDB(mongoClient, mongoSettings.DatabaseName));
 
         return services;
     }

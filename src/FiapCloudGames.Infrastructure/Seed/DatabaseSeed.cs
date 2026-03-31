@@ -2,9 +2,10 @@ using FiapCloudGames.Application.Interfaces;
 using FiapCloudGames.Domain.Entities;
 using FiapCloudGames.Domain.Enums;
 using FiapCloudGames.Domain.ValueObjects;
+using FiapCloudGames.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 
 namespace FiapCloudGames.Infrastructure.Seed;
 
@@ -13,22 +14,22 @@ public static class DatabaseSeed
     public static async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken ct = default)
     {
         using var scope = serviceProvider.CreateScope();
-        var database = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<IMongoDatabase>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
 
-        await SeedUsuarioAdminAsync(database, passwordHasher, logger, ct);
-        await SeedJogosAsync(database, logger, ct);
+        await SeedUsuarioAdminAsync(context, passwordHasher, logger, ct);
+        await SeedJogosAsync(context, logger, ct);
     }
 
     private static async Task SeedUsuarioAdminAsync(
-        IMongoDatabase database,
+        AppDbContext context,
         IPasswordHasher passwordHasher,
         ILogger logger,
         CancellationToken ct)
     {
-        var collection = database.GetCollection<Usuario>("usuarios");
-        var adminExiste = await collection.Find(u => u.Email == new Email("admin@fcg.com")).AnyAsync(ct);
+        var adminExiste = await context.Usuarios
+            .AnyAsync(u => u.Email == new Email("admin@fcg.com"), ct);
 
         if (adminExiste)
         {
@@ -39,17 +40,17 @@ public static class DatabaseSeed
         var senhaHash = passwordHasher.Hash("Admin@123456");
         var admin = new Usuario("Administrador FCG", new Email("admin@fcg.com"), senhaHash, TipoUsuario.Administrador);
 
-        await collection.InsertOneAsync(admin, cancellationToken: ct);
+        context.Usuarios.Add(admin);
+        await context.SaveChangesAsync(ct);
         logger.LogInformation("Seed: Usuário administrador criado com sucesso");
     }
 
     private static async Task SeedJogosAsync(
-        IMongoDatabase database,
+        AppDbContext context,
         ILogger logger,
         CancellationToken ct)
     {
-        var collection = database.GetCollection<Jogo>("jogos");
-        var count = await collection.CountDocumentsAsync(FilterDefinition<Jogo>.Empty, cancellationToken: ct);
+        var count = await context.Jogos.CountAsync(ct);
 
         if (count > 0)
         {
@@ -66,7 +67,8 @@ public static class DatabaseSeed
             new Jogo("Cyber Shield: Defesa Digital", "Defenda sua rede contra ataques cibernéticos em tempo real.", GeneroJogo.Acao, new Preco(44.90m), new DateTime(2024, 11, 25))
         };
 
-        await collection.InsertManyAsync(jogos, cancellationToken: ct);
+        context.Jogos.AddRange(jogos);
+        await context.SaveChangesAsync(ct);
         logger.LogInformation("Seed: {Count} jogos de exemplo criados com sucesso", jogos.Length);
     }
 }
