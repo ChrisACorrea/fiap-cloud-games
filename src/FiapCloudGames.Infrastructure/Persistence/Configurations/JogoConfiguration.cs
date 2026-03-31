@@ -48,6 +48,8 @@ public sealed class JogoConfiguration : IEntityTypeConfiguration<Jogo>
                 .IsRequired();
         });
 
+        builder.HasQueryFilter("SoftDelete", j => j.Ativo);
+
         builder.HasIndex(j => j.Titulo)
             .IsUnique();
 
