@@ -16,7 +16,8 @@ public sealed class BibliotecaJogoConfiguration : IEntityTypeConfiguration<Bibli
 
         builder.Property(b => b.Id)
             .HasBsonRepresentation(BsonType.ObjectId)
-            .ValueGeneratedOnAdd();
+            .HasValueGenerator<ObjectIdStringValueGenerator>();
+        builder.Property(b => b.Id).Metadata.Sentinel = string.Empty;
 
         builder.Property(b => b.UsuarioId)
             .IsRequired();

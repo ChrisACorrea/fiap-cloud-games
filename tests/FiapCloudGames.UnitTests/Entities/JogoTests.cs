@@ -90,4 +90,63 @@ public class JogoTests
         jogo.Ativar();
         jogo.Ativo.Should().BeTrue();
     }
+
+    [Fact]
+    public void DeveAtualizarDescricao()
+    {
+        var jogo = new Jogo("Título", "Descrição Original", GeneroJogo.Acao, PrecoValido, DataLancamento);
+
+        jogo.AtualizarDescricao("Nova Descrição");
+
+        jogo.Descricao.Should().Be("Nova Descrição");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void DeveLancarExcecao_QuandoAtualizarDescricaoVaziaOuNula(string? descricao)
+    {
+        var jogo = new Jogo("Título", "Descrição", GeneroJogo.Acao, PrecoValido, DataLancamento);
+
+        var act = () => jogo.AtualizarDescricao(descricao!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("A descrição do jogo é obrigatória.");
+    }
+
+    [Fact]
+    public void DeveAtualizarGenero()
+    {
+        var jogo = new Jogo("Título", "Descrição", GeneroJogo.Acao, PrecoValido, DataLancamento);
+
+        jogo.AtualizarGenero(GeneroJogo.RPG);
+
+        jogo.Genero.Should().Be(GeneroJogo.RPG);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void DeveLancarExcecao_QuandoAtualizarTituloVazioOuNulo(string? titulo)
+    {
+        var jogo = new Jogo("Título", "Descrição", GeneroJogo.Acao, PrecoValido, DataLancamento);
+
+        var act = () => jogo.AtualizarTitulo(titulo!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("O título do jogo é obrigatório.");
+    }
+
+    [Fact]
+    public void DeveLancarExcecao_QuandoAtualizarPrecoNulo()
+    {
+        var jogo = new Jogo("Título", "Descrição", GeneroJogo.Acao, PrecoValido, DataLancamento);
+
+        var act = () => jogo.AtualizarPreco(null!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("O preço é obrigatório.");
+    }
 }

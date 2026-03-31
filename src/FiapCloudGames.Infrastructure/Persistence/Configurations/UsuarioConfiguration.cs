@@ -17,7 +17,8 @@ public sealed class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.Id)
             .HasBsonRepresentation(BsonType.ObjectId)
-            .ValueGeneratedOnAdd();
+            .HasValueGenerator<ObjectIdStringValueGenerator>();
+        builder.Property(u => u.Id).Metadata.Sentinel = string.Empty;
 
         builder.Property(u => u.Nome)
             .IsRequired();

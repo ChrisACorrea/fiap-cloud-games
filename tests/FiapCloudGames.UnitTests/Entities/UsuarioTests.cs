@@ -86,4 +86,64 @@ public class UsuarioTests
         usuario.Ativar();
         usuario.Ativo.Should().BeTrue();
     }
+
+    [Fact]
+    public void DeveAtualizarEmail()
+    {
+        var usuario = new Usuario("Felipe", EmailValido, SenhaHashValida);
+        var novoEmail = new Email("novo@email.com");
+
+        usuario.AtualizarEmail(novoEmail);
+
+        usuario.Email.Should().Be(novoEmail);
+    }
+
+    [Fact]
+    public void DeveLancarExcecao_QuandoAtualizarEmailNulo()
+    {
+        var usuario = new Usuario("Felipe", EmailValido, SenhaHashValida);
+
+        var act = () => usuario.AtualizarEmail(null!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("O e-mail é obrigatório.");
+    }
+
+    [Fact]
+    public void DeveAtualizarSenha()
+    {
+        var usuario = new Usuario("Felipe", EmailValido, SenhaHashValida);
+
+        usuario.AtualizarSenha("$2a$12$novohash");
+
+        usuario.SenhaHash.Should().Be("$2a$12$novohash");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void DeveLancarExcecao_QuandoAtualizarSenhaVaziaOuNula(string? senhaHash)
+    {
+        var usuario = new Usuario("Felipe", EmailValido, SenhaHashValida);
+
+        var act = () => usuario.AtualizarSenha(senhaHash!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("O hash da senha é obrigatório.");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void DeveLancarExcecao_QuandoAtualizarNomeVazioOuNulo(string? nome)
+    {
+        var usuario = new Usuario("Felipe", EmailValido, SenhaHashValida);
+
+        var act = () => usuario.AtualizarNome(nome!);
+
+        act.Should().Throw<ValidacaoException>()
+            .WithMessage("O nome do usuário é obrigatório.");
+    }
 }
