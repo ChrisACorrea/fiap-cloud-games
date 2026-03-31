@@ -189,6 +189,20 @@ fiap-cloud-games/
 └── README.md
 ```
 
+## Documentacao DDD
+
+A modelagem de dominio completa com Event Storming esta disponivel em:
+
+**[docs/DDD.md](docs/DDD.md)**
+
+Conteudo:
+- Linguagem Ubiqua (glossario)
+- Contextos Delimitados (diagrama Mermaid)
+- Mapa de Agregados (entidades, VOs, relacoes)
+- Event Storming dos 4 fluxos principais (Registro, Login, Jogos, Aquisicao)
+- Comandos, Eventos e Politicas por contexto
+- Invariantes de Dominio
+
 ## Decisoes Tecnicas
 
 | Decisao | Justificativa |
@@ -204,8 +218,12 @@ fiap-cloud-games/
 
 | Nome | RM |
 |---|---|
-| Felipe Morandini | - |
+| Thiago Goulart de Brito | RM370407 |
+| Felipe Pires Morandini | RM370354 |
+| Lucas Silva | RM372520 |
+| Christopher Correa | RM372035 |
+| Flavio Ferreira de Luna | RM393706 |
 
 ## Licenca
 
-Este projeto esta licenciado sob a licenca MIT.
+Este projeto esta licenciado sob a licenca MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
