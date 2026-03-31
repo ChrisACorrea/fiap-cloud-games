@@ -1,6 +1,8 @@
 using FiapCloudGames.API.Middlewares;
+using FiapCloudGames.Application.Validators;
 using FiapCloudGames.Infrastructure.Extensions;
 using FiapCloudGames.Infrastructure.Seed;
+using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -59,6 +61,8 @@ try
             options.IncludeXmlComments(xmlFile);
         }
     });
+
+    builder.Services.AddValidatorsFromAssemblyContaining<CriarUsuarioValidator>();
 
     builder.Services.AddMongoDb(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);

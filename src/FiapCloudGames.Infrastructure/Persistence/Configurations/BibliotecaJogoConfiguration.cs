@@ -1,6 +1,7 @@
 using FiapCloudGames.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MongoDB.Bson;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace FiapCloudGames.Infrastructure.Persistence.Configurations;
@@ -12,6 +13,10 @@ public sealed class BibliotecaJogoConfiguration : IEntityTypeConfiguration<Bibli
         builder.ToCollection("biblioteca_jogos");
 
         builder.HasKey(b => b.Id);
+
+        builder.Property(b => b.Id)
+            .HasBsonRepresentation(BsonType.ObjectId)
+            .ValueGeneratedOnAdd();
 
         builder.Property(b => b.UsuarioId)
             .IsRequired();

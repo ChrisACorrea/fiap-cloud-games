@@ -1,6 +1,7 @@
 using FiapCloudGames.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MongoDB.Bson;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace FiapCloudGames.Infrastructure.Persistence.Configurations;
@@ -12,6 +13,10 @@ public sealed class JogoConfiguration : IEntityTypeConfiguration<Jogo>
         builder.ToCollection("jogos");
 
         builder.HasKey(j => j.Id);
+
+        builder.Property(j => j.Id)
+            .HasBsonRepresentation(BsonType.ObjectId)
+            .ValueGeneratedOnAdd();
 
         builder.Property(j => j.Titulo)
             .IsRequired();
