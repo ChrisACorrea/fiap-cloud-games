@@ -13,14 +13,13 @@ public sealed class JogoRepository(AppDbContext context) : IJogoRepository
 
     public async Task<IEnumerable<Jogo>> ObterTodosAsync(int pagina, int tamanhoPagina, CancellationToken ct = default) =>
         await context.Jogos
-            .Where(j => j.Ativo)
             .Skip((pagina - 1) * tamanhoPagina)
             .Take(tamanhoPagina)
             .ToListAsync(ct);
 
     public async Task<IEnumerable<Jogo>> BuscarPorGeneroAsync(GeneroJogo genero, int pagina, int tamanhoPagina, CancellationToken ct = default) =>
         await context.Jogos
-            .Where(j => j.Ativo && j.Genero == genero)
+            .Where(j => j.Genero == genero)
             .Skip((pagina - 1) * tamanhoPagina)
             .Take(tamanhoPagina)
             .ToListAsync(ct);

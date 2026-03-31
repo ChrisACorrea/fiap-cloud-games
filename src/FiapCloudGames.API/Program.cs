@@ -3,7 +3,7 @@ using FiapCloudGames.Application.Validators;
 using FiapCloudGames.Infrastructure.Extensions;
 using FiapCloudGames.Infrastructure.Seed;
 using FluentValidation;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -40,18 +40,11 @@ try
             BearerFormat = "JWT"
         });
 
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
         {
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
+                new OpenApiSecuritySchemeReference("Bearer"),
+                new List<string>()
             }
         });
 

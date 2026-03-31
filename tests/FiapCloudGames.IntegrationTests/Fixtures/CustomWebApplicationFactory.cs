@@ -21,8 +21,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Environment.SetEnvironmentVariable("DOCKER_HOST", $"unix://{orbstackSocket}");
         }
 
-        _mongoContainer = new MongoDbBuilder()
-            .WithImage("mongo:7.0")
+        _mongoContainer = new MongoDbBuilder("mongo:7.0")
             .Build();
     }
 
