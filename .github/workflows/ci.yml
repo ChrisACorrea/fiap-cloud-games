@@ -46,9 +46,16 @@ jobs:
     name: Integration Tests
     needs: build
     runs-on: ubuntu-latest
-    continue-on-error: true
-    env:
-      TESTCONTAINERS_RYUK_DISABLED: true
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1})' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -58,6 +65,8 @@ jobs:
       - run: dotnet build --configuration Release --no-restore
       - name: Run Integration Tests
         run: dotnet test tests/FiapCloudGames.IntegrationTests --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx"
+        env:
+          INTEGRATION_TEST_MONGODB: mongodb://localhost:27017
       - uses: actions/upload-artifact@v4
         if: always()
         with:
