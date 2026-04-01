@@ -83,7 +83,14 @@ try
     app.UseAuthorization();
     app.MapControllers();
 
-    await DatabaseSeed.SeedAsync(app.Services);
+    try
+    {
+        await DatabaseSeed.SeedAsync(app.Services);
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Seed de dados falhou. A aplicação continuará sem dados iniciais.");
+    }
 
     await app.RunAsync();
 }
