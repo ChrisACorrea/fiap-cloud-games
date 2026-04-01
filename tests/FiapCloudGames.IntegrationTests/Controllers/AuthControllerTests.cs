@@ -13,9 +13,10 @@ public sealed class AuthControllerTests(CustomWebApplicationFactory factory) : I
     [Fact]
     public async Task Login_DeveRetornarToken_QuandoCredenciaisValidas()
     {
-        await RegistrarUsuarioAsync("Teste", "auth@test.com", "Senha@123");
+        var email = $"auth-{Guid.NewGuid():N}@test.com";
+        await RegistrarUsuarioAsync("Teste", email, "Senha@123");
 
-        var dto = new LoginRequestDto("auth@test.com", "Senha@123");
+        var dto = new LoginRequestDto(email, "Senha@123");
         var response = await Client.PostAsJsonAsync("/api/v1/auth/login", dto);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
