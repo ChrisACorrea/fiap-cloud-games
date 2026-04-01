@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, Test & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Unit Tests
+        run: dotnet test tests/FiapCloudGames.UnitTests --configuration Release --no-build
+
+      - name: Integration Tests
+        run: dotnet test tests/FiapCloudGames.IntegrationTests --configuration Release --no-build
+
+      - name: Publish (linux-x64)
+        run: dotnet publish src/FiapCloudGames.API --configuration Release --runtime linux-x64 --self-contained false --output ./publish
+
+      - name: Package Artifact
+        run: tar -czf fiap-cloud-games-${{ github.ref_name }}-linux-x64.tar.gz -C ./publish .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: fiap-cloud-games-${{ github.ref_name }}-linux-x64.tar.gz
