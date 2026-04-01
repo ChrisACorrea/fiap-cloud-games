@@ -9,40 +9,58 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  TESTCONTAINERS_RYUK_DISABLED: true
 
 jobs:
-  build-and-test:
-    name: Build & Test (.NET 10)
+  build:
+    name: Build (.NET 10)
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET 10
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore --warnaserror
 
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore --warnaserror
-
-      - name: Unit Tests
+  unit-tests:
+    name: Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore
+      - name: Run Unit Tests
         run: dotnet test tests/FiapCloudGames.UnitTests --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx"
-
-      - name: Integration Tests
-        run: dotnet test tests/FiapCloudGames.IntegrationTests --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx"
-        env:
-          DOCKER_HOST: unix:///var/run/docker.sock
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: unit-test-results
+          path: '**/TestResults/*.trx'
+          retention-days: 7
+
+  integration-tests:
+    name: Integration Tests
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore
+      - name: Run Integration Tests
+        run: dotnet test tests/FiapCloudGames.IntegrationTests --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
           path: '**/TestResults/*.trx'
           retention-days: 7
