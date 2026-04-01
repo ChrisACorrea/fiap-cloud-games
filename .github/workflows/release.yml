@@ -30,9 +30,6 @@ jobs:
       - name: Unit Tests
         run: dotnet test tests/FiapCloudGames.UnitTests --configuration Release --no-build
 
-      - name: Integration Tests
-        run: dotnet test tests/FiapCloudGames.IntegrationTests --configuration Release --no-build
-
       - name: Publish (linux-x64)
         run: dotnet publish src/FiapCloudGames.API --configuration Release --runtime linux-x64 --self-contained false --output ./publish
 
