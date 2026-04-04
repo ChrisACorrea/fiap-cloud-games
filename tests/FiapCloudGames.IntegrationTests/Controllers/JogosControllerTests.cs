@@ -80,6 +80,7 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     public async Task Listar_DeveRetornar200_QuandoSemAuth()
     {
         await CriarJogoAsync();
+        Desautenticar();
 
         var response = await Client.GetAsync("/api/v1/jogos");
 
@@ -93,6 +94,7 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     {
         await CriarJogoAsync(genero: GeneroJogo.RPG);
         await CriarJogoAsync(genero: GeneroJogo.Acao);
+        Desautenticar();
 
         var response = await Client.GetAsync("/api/v1/jogos?genero=2"); // RPG
 
@@ -105,6 +107,7 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     public async Task ObterPorId_DeveRetornar200_QuandoSemAuth()
     {
         var jogo = await CriarJogoAsync();
+        Desautenticar();
 
         var response = await Client.GetAsync($"/api/v1/jogos/{jogo.Id}");
 

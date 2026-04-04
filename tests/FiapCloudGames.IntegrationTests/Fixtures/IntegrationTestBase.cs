@@ -58,6 +58,11 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     {
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
+
+    protected void Desautenticar()
+    {
+        Client.DefaultRequestHeaders.Authorization = null;
+    }
 }
 
 [CollectionDefinition("Integration")]
