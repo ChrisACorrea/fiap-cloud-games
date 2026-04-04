@@ -12,6 +12,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
   - Busca de jogo por ID (`GET /api/v1/jogos/{id}`)
   - Atualizar testes de integração do `JogosController` para refletir os endpoints públicos
 
+### Corrigido
+- Corrigir configuração do Swagger para enviar token JWT nas requisições autenticadas:
+  - Alterar `SecuritySchemeType` de `ApiKey` para `Http` com scheme `bearer`
+  - Passar `document` ao `OpenApiSecuritySchemeReference` para serialização correta do requisito de segurança
+
 ## [1.2.0] - 2026-03-31
 
 ### Alterado
