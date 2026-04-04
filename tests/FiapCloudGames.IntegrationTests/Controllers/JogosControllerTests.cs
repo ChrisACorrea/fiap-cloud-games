@@ -77,11 +77,16 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     }
 
     [Fact]
-    public async Task Listar_DeveRetornar401_QuandoSemAuth()
+    public async Task Listar_DeveRetornar200_QuandoSemAuth()
     {
+        await CriarJogoAsync();
+        Desautenticar();
+
         var response = await Client.GetAsync("/api/v1/jogos");
 
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<PaginacaoResponseDto<JogoResponseDto>>();
+        result!.Itens.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -89,6 +94,7 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     {
         await CriarJogoAsync(genero: GeneroJogo.RPG);
         await CriarJogoAsync(genero: GeneroJogo.Acao);
+        Desautenticar();
 
         var response = await Client.GetAsync("/api/v1/jogos?genero=2"); // RPG
 
@@ -98,11 +104,10 @@ public sealed class JogosControllerTests(CustomWebApplicationFactory factory) : 
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornar200()
+    public async Task ObterPorId_DeveRetornar200_QuandoSemAuth()
     {
         var jogo = await CriarJogoAsync();
-        var token = await ObterTokenUsuarioAsync();
-        AutenticarComo(token);
+        Desautenticar();
 
         var response = await Client.GetAsync($"/api/v1/jogos/{jogo.Id}");
 
