@@ -31,6 +31,7 @@ public sealed class JogosController(
     /// <returns>Lista paginada de jogos.</returns>
     /// <response code="200">Lista de jogos retornada com sucesso.</response>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PaginacaoResponseDto<JogoResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
@@ -52,6 +53,7 @@ public sealed class JogosController(
     /// <response code="200">Jogo retornado com sucesso.</response>
     /// <response code="404">Jogo não encontrado.</response>
     [HttpGet("{id}")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(JogoResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(string id, CancellationToken ct)

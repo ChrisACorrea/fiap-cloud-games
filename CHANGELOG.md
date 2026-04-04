@@ -4,6 +4,14 @@ Todas as mudancas relevantes do projeto estao documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere ao [Versionamento Semantico](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - 2026-04-04
+
+### Alterado
+- Permitir acesso sem autenticação ao catálogo de jogos:
+  - Listagem paginada (`GET /api/v1/jogos`)
+  - Busca de jogo por ID (`GET /api/v1/jogos/{id}`)
+  - Atualizar testes de integração do `JogosController` para refletir os endpoints públicos
+
 ## [1.2.0] - 2026-03-31
 
 ### Alterado
